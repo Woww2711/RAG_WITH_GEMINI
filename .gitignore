@@ -1,0 +1,6 @@
+
+RAG_TECHNIQUES/
+.env
+.deepeval
+__pycache__/
+.ipynb_checkpoints/

@@ -1,0 +1,54 @@
+## 1 - Simple rag
+1. Best to use both GEMINI_API_KEY and GOOGLE_API_KEY in .env, with the same value, because some modules use GEMINI, others use GOOGLE.
+2. Be careful of what the variables in curly bracket you named in from_templates, naming them arbitrarily may lead to KeyError: naming mismatch when calling invoke.
+
+## 2 - Rag with CSV
+3. When working with CSV files, first consider the row numbers then decide whether or not to use text splitter, you should only use it when 1 or more columns contain a bunch of text, or a lengthy paragraph. Splitting small csv file may lead to incorrect information retrieval. Also, row-level chunking is automatically done by the CSVLoader load() method.
+4. FAISS vectorstore can be created automatically by passing the embedding model and the documents (from_documents method), or you want full control over the FAISS initialization: embedding model, index implementation, docstore, index and id mapping,... (add_documents method).
+5. The ChatPromptTemplate has 2 modules:
+- from_template: contains all system prompt, context, and user's question in a big string. The LLM will receive this plain message from user. This method is simple, easy and great for beginners, but can not utilize the chat template that modern chat models were trained on, and hard to manage chat history.
+- from_messages: make a list of structured messages, each will be given a role (system, user, assistant or AI). The LLM will receive a JSON data. Clear separation between AI answer and user's question. Works really well with modern AI chatbot, better responses and adherence to instructions. Also it's more easy to build and manage the conversation history. In conclusion, use from_messages, it's best practice.
+
+## 3 - Reliable Rag
+6. Set the model's temperature to 0 so that the same input would always give the same output.
+7. If you have set the max_tokens to a certain number, it may lead to the AI model returning an empty string because it has reached the max token due to long context, or question.
+8. Split by character and split by token: 
+- RecursiveCharacterTextSplitter(chunk_size=1000, ...) splits the text by trying to find separators (\n\n, \n), then create chunks that are approximately 1000 characters long. The problem is that LLM don't see characters, they see `tokens`. 1000 characters may be 600 or 800 tokens, depending on the words. This is imprecise
+- from_tiktoken_encoder(chunk_size=500, ...) instead tokenizes the text, then creates chunks that are exactly 500 tokens. This is the best practice, optimized for LLM processing. You have alsolute control over the size of context.
+9. The AI model can be compelled to output a strict data schema (JSON, Pydantic,...). This can be achieved through the PydanticOutputParser. The LLM must follow this explicit formatting instructions, therefore minimize the chance of errors and ensure that the output is always in a predictable and usable format.
+
+## 4 - Propositions Chunking
+10. Always a good practice to use strict data schema to make the output format easy to process.
+11. Propositions chunking requires a handful of API call to check the quality of propositions, which is not ideal when we want to optimize for cost and efficiency.
+
+## 5 - Query Transformations
+
+| Template Type | `PromptTemplate` | `ChatPromptTemplate` | `FewShotPromptTemplate` |
+| :--- | :--- | :--- | :--- |
+| **Essence** | A simple text string | A **list of messages with roles** | A complex text string containing **sample examples** |
+| **Analogy** | Fill-in-the-blanks game (Mad Libs) | **Movie script** | **Teaching by example** |
+| **Suitable Model** | Older LLMs that only accept a single text string | **Most modern Chat Models** (Gemini, GPT-4,...) | All types of LLMs |
+| **Use Case**| When an extremely simple prompt is needed | **When building chatbots, RAG, agents** (almost all the time) | When needing to instruct an LLM for a complex task or a specific format |
+
+
+## 6 - HyDE
+12. HyDE is a retrieval enhancement technique, not an answering mechanism. So remember to implement the answering (Generation part) in order to create the full RAG loop.
+13. HyDE can be imported via the `from langchain.chains.hyde.base import HypotheticalDocumentEmbedder`, this acts as an embeddings wrapper, which wraps around an existing embeddings model.
+
+## 7 - HyPE
+14. For each chunk splitted from the original documents, there will be an API call to create multiple hypothetical prompts for that specific chunk. As your documents get larger in size, you'll surely reach the API limit. This approach requires you to not overwhelm the API and also be able to handle failures when you hit the rate limit (same as propositions chunking).
+
+## 8 - Contextual Chunk Headers
+15. Respect the rate limits of models when coding, use batches, add delays, calculate total tokens to make sure you don't exceed the TPM
+16. Use rerank model, the retriever only retrieves list of chunks (documents) that could be relevant to the query, while the rerank model will assess and score each candidate to find the chunk most relevant to the query, therefore enhance the accuracy of the RAG system.
+17. The complete process:
+    1. Retrieval: Use the retriever to retrieve 10-20 most relevant chunks from thousands of chunks.
+    2. Reranking: Pass these 10-20 chunks to the specialized Reranker to be scored and reranked.
+    3. Generation: Take the top 3-5 highest-scoring chunks from the Reranker and pass them to the final LLM to synthesize the answer.
+
+## 9 - Relevant Segment Extraction
+18. This method will require `chunk_overlap = 0`, this allows the reconstruction of the document (segments) by simply concatenating chunks.
+19. Chunks will be graded through the combination of relevance score and rank (both from the rerank model). Basically, the lower the rank, the more penalty chunks will get. The new score is called `chunk_values`, and this will be crucial for the next step.
+20. We subtract the `chunk_values` by a value called `irrelevant_chunk_penalty`, `0.2` seems to work well empirically. This will make the value of irrelevant chunks to a negative number, while keeping the values of relevant chunks positive.
+21. The nested for loop is just a demonstration of how things would look like under the hood. In practical, large scale scenarios, more optimized and efficient method will be used.
+22. Try to find the most suitable `overall_max_length`. The size of the final retrieved chunks of document will greatly be affected by the parameter `overall_max_length`. It acts like a limit for how much context can be passed into the LLM. Having this under control means that having cost and latency under control.
