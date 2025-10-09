@@ -1,3 +1,14 @@
+# A Journey Through Advanced RAG Techniques
+This repository is a collection of Jupyter Notebooks that document a step-by-step exploration of Retrieval-Augmented Generation (RAG). The project starts with simple, foundational RAG pipeline and progressively introduces more advanced, production-grade techniques to improve accuracy, reliability and efficiency.
+
+This repository also serves as a personal knowledge base, capturing key lessons, best practices, and common pitfalls encountered during the development and implementation of each RAG strategy.
+
+This repository is heavily based of the repo [NirDiamant/RAG_Techniques](https://github.com/NirDiamant/RAG_Techniques/tree/main), but relied on free to use API (Gemini, Cohere, etc.) rather than OpenAI API for the LLM, the embeddings, the rerank model, etc.
+
+## Warning: Wall Of Text 
+
+The next part maybe lengthy, but worth a read. This part will be consistently updated until I finished every lesson.
+
 ## 1 - Simple rag
 1. Best to use both GEMINI_API_KEY and GOOGLE_API_KEY in .env, with the same value, because some modules use GEMINI, others use GOOGLE.
 2. Be careful of what the variables in curly bracket you named in from_templates, naming them arbitrarily may lead to KeyError: naming mismatch when calling invoke.
