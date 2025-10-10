@@ -63,3 +63,12 @@ The next part maybe lengthy, but worth a read. This part will be consistently up
 20. We subtract the `chunk_values` by a value called `irrelevant_chunk_penalty`, `0.2` seems to work well empirically. This will make the value of irrelevant chunks to a negative number, while keeping the values of relevant chunks positive.
 21. The nested for loop is just a demonstration of how things would look like under the hood. In practical, large scale scenarios, more optimized and efficient method will be used.
 22. Try to find the most suitable `overall_max_length`. The size of the final retrieved chunks of document will greatly be affected by the parameter `overall_max_length`. It acts like a limit for how much context can be passed into the LLM. Having this under control means that having cost and latency under control.
+
+## 10 - Context Enrichment Window
+23. In basic RAG, user inputs a query, the retriever outputs a chunk(`k = 1`) that is relevant to the query, this chunk will have an index `n`. When using context enrichment window, we can specify a new parameter called `num_neighbor`, instead of retrieving only chunk with index `n`, the retriever will expand, or enrich the context by also including chunks that have index between `n - num_neighbor` and `n + num_neighbor`. For example, `num_neighbor = 1`, chunk with index `5` was chosen by the retriever, then the final context would be chunk `4,5,6`.
+24. **RecursiveCharacterTextSplitter** contains 2 methods: `split_documents` and `split_text`
+- **split_documents:** takes in a list of `Document` objects, outputs a list of `Document` objects that is splitted into smaller parts, and **retains the metadata**
+- **split_text:** takes in a string, returns a list of strings splitted from the original string, and **does not include metadata**
+
+    In other word, split_documents should be considered first rather that split_text, unless you have other uses for it.
+25. chunk_overlap should not be set to 0, this ensures that contents and ideas are not corrupted between splitted chunks. Also, modern LLMs can easily handle these overlapped chunks without sacrificing quality.
