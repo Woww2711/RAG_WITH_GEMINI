@@ -72,3 +72,7 @@ The next part maybe lengthy, but worth a read. This part will be consistently up
 
     In other word, split_documents should be considered first rather that split_text, unless you have other uses for it.
 25. chunk_overlap should not be set to 0, this ensures that contents and ideas are not corrupted between splitted chunks. Also, modern LLMs can easily handle these overlapped chunks without sacrificing quality.
+
+## 11 - Semantic Chunking
+26. text_splitter from SemanticChunker will apply the embedding model on each and every **sentences** of the data (pdf, md, etc.), which means a sheer amount of API calls. You should choose embedding model wisely to reduce costs if you're choosing to call API. Otherwise, download some embedding models to the local PC and test them for the best result. I used Cohere Embedding model instead of Gemini because the rate limits are much more generous even at free tier.
+27. Choosing the right `breakpoint_threshold_type` is important too! Test all `percetile`, `standard_deviation` and `interquartile` to see which fits best with your data.
