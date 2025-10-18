@@ -76,3 +76,18 @@ The next part maybe lengthy, but worth a read. This part will be consistently up
 ## 11 - Semantic Chunking
 26. text_splitter from SemanticChunker will apply the embedding model on each and every **sentences** of the data (pdf, md, etc.), which means a sheer amount of API calls. You should choose embedding model wisely to reduce costs if you're choosing to call API. Otherwise, download some embedding models to the local PC and test them for the best result. I used Cohere Embedding model instead of Gemini because the rate limits are much more generous even at free tier.
 27. Choosing the right `breakpoint_threshold_type` is important too! Test all `percetile`, `standard_deviation` and `interquartile` to see which fits best with your data.
+
+## 12 - Contextual Compression
+28. Actually, we've been doing contextual compression (CC) a few times now, `reranker` for example, is also considered a CC technique. CC is not a single, modular technique, it's more of an architecture, a processing model. So what's the differences you might ask:
+
+| Aspect | Contextual Compression with Reranker | Contextual Compression with LLMChainExtractor |
+| :--- | :--- | :--- |
+| **Analogy** | A "Judge" | An "Editor / Highlighter" |
+| **Main Task** | **SELECT:** Skims through the documents and selects the top `n` best documents. | **EXTRACT:** Reads each document carefully and cuts out only the relevant sentences. |
+| **Output of the "Compressor"**| A list of the **original** Documents, reranked and filtered. | A list of **new** Documents, whose content consists of the extracted sentences. |
+| **Final Context Quality**| Good. Noise has been filtered at the document level. | Very high. Extremely concise and clean, containing only the "gold". |
+| **Cost** | Usually lower (A Reranker's API is often cheaper than a full LLM call). | Higher. Requires an LLM call for each retrieved document. |
+| **Latency** | Relatively fast. | Slower, as the LLM needs time to read and extract from each document. |
+| **Technical Term** | Reranking | Relevant Segment Extraction (RSE) |
+
+29. The RetrievalQA is good enough if you don't need to extensively configure params, i/o format, or chain parts together. Just a simple all in one solution. But in reality, everything in LangChain should follow the LCEL method, which is using the `|` operator to ensure high flexibility and transparency.
