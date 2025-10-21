@@ -91,3 +91,9 @@ The next part maybe lengthy, but worth a read. This part will be consistently up
 | **Technical Term** | Reranking | Relevant Segment Extraction (RSE) |
 
 29. The RetrievalQA is good enough if you don't need to extensively configure params, i/o format, or chain parts together. Just a simple all in one solution. But in reality, everything in LangChain should follow the LCEL method, which is using the `|` operator to ensure high flexibility and transparency.
+
+## 13 - Document Augmentation
+30. I won't be doing the code for this, the cost is just to high. It needs multiple LLM calls just for data preparation, using local models would be the most optimal choice.
+31. First, all the content will be splitted into "big chunks" (`text_documents`, e.g. 2000 tokens each). Next, for every "big" chunks, we'll split them into "small chunks" (`text_fragments`, e.g. 200 tokens each). Base on the configuration, the code will call LLM to create a list of questions that the chunks can provide an answer (small chunks or big chunks, base on config). Just like HyPE.
+32. The difference with HyPE is that Document Augmentation finds the small chunk, returns the big chunk that contains the small chunk, while HyPE only returns the small chunk. Which means DA provides more context, and lower latency, because the questions generation was already done, the process is just a vector search, and an LLM call.
+33. Returning a whole big chunk may contains unrelated information, which would increase tokens usage and possibly make the LLM confused.
