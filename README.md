@@ -97,3 +97,7 @@ The next part maybe lengthy, but worth a read. This part will be consistently up
 31. First, all the content will be splitted into "big chunks" (`text_documents`, e.g. 2000 tokens each). Next, for every "big" chunks, we'll split them into "small chunks" (`text_fragments`, e.g. 200 tokens each). Base on the configuration, the code will call LLM to create a list of questions that the chunks can provide an answer (small chunks or big chunks, base on config). Just like HyPE.
 32. The difference with HyPE is that Document Augmentation finds the small chunk, returns the big chunk that contains the small chunk, while HyPE only returns the small chunk. Which means DA provides more context, and lower latency, because the questions generation was already done, the process is just a vector search, and an LLM call.
 33. Returning a whole big chunk may contains unrelated information, which would increase tokens usage and possibly make the LLM confused.
+
+## 14 - Fusion Retrieval
+34. Fusion retrieval is to combine both semantic retriever (FAISS, Chroma, etc.) and keyword retriever (BM25, TF-IDF, etc.) to further enhance retrieval quality.
+35. Each retriever outputs a different score, on a different scale, so a normalization and rescoring must be done before reranking the docs. LangChain has a module for this called `EnsembleRetriever`, which takes 2 retrievers and their weights as input, and outputs a list of `k` most relevant docs. By the way, you can also implement your own normalization and scoring technique if your retriever needs different processing method.
