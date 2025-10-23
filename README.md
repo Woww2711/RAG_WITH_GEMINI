@@ -101,3 +101,17 @@ The next part maybe lengthy, but worth a read. This part will be consistently up
 ## 14 - Fusion Retrieval
 34. Fusion retrieval is to combine both semantic retriever (FAISS, Chroma, etc.) and keyword retriever (BM25, TF-IDF, etc.) to further enhance retrieval quality.
 35. Each retriever outputs a different score, on a different scale, so a normalization and rescoring must be done before reranking the docs. LangChain has a module for this called `EnsembleRetriever`, which takes 2 retrievers and their weights as input, and outputs a list of `k` most relevant docs. By the way, you can also implement your own normalization and scoring technique if your retriever needs different processing method.
+
+## 15 - Reranking
+36. There are multiple methods of reranking, each has its own advantages and disadvantages:
+
+| Aspect | Cross-Encoder (Open-Source) | LLM as a Reranker | Rerank API (Cohere)|
+| :--- | :--- | :--- | :--- |
+| **How it Works** | Cross-comparison (Query, Doc) | Executes based on a prompt | Optimized Cross-Encoder service |
+| **Speed** | Medium (GPU dependent) | **Slowest** | **Fastest** |
+| **Cost** | **Cheapest** (only infrastructure cost) | **Most Expensive** | Medium (pay-per-API call) |
+| **Accuracy** | **Very High** | Good, but inconsistent | **Very High (SOTA)** |
+| **Complexity** | **High** (self-managed) | Medium (requires good prompting) | **Very Low** (just an API call) |
+
+Also, there exists many more reranking techniques but I won't be discussing about it.
+
