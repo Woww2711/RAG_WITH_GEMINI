@@ -115,3 +115,7 @@ The next part maybe lengthy, but worth a read. This part will be consistently up
 
 Also, there exists many more reranking techniques but I won't be discussing about it.
 
+## 16 - Hierarchical Indices
+37. This is a retriever optimization technique, not chunking or reranking. It changes the data structure of the vectorstore in order to accelarate the `retriever.invoke()` step by many times.
+38. This technique should be used with other RAG techniques such as CCH, HyDE, HyPE, etc. Each of them addresses different process in the RAG pipeline.
+39. Hierarchical Indices requires many API calls, and it would just get much more as the documents pile up. If you plan to use external APIs, robust limit rate backoff techniques should be implemented to ensure the pipeline's stability (less prone to API errors) and versatility (can adapt to many kinds of API).
