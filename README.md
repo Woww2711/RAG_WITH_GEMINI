@@ -119,3 +119,9 @@ Also, there exists many more reranking techniques but I won't be discussing abou
 37. This is a retriever optimization technique, not chunking or reranking. It changes the data structure of the vectorstore in order to accelarate the `retriever.invoke()` step by many times.
 38. This technique should be used with other RAG techniques such as CCH, HyDE, HyPE, etc. Each of them addresses different process in the RAG pipeline.
 39. Hierarchical Indices requires many API calls, and it would just get much more as the documents pile up. If you plan to use external APIs, robust limit rate backoff techniques should be implemented to ensure the pipeline's stability (less prone to API errors) and versatility (can adapt to many kinds of API).
+
+## 17 - Dartboard
+40. Dartboard is a type of reranking, but more complex and more efficient. 
+- Typical reranking method would only `grade` chunk independently of each others, and give them a score base on their relevance with the query, then ranking at the end.
+- Dartboard, on the other hand, firstly finds the most relevant chunk, then proceed to find the next chunk that: has relevance with the query, also differs from the first chunk. In other words, dartboard finds `k` chunks that are: relevant to the query, and also differs from each others. The purpose is not to find the best chunks, but a collective of chunks that when they come together, provides the most comprehensive context to feed to the LLM.
+41. This technique does not require extensive API calls to preprocess data, only linear algebra and statistics are needed to optimize. This is much more reliable than APIs, which can sometimes be overkill and time-consuming.
