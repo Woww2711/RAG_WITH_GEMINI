@@ -125,3 +125,7 @@ Also, there exists many more reranking techniques but I won't be discussing abou
 - Typical reranking method would only `grade` chunk independently of each others, and give them a score base on their relevance with the query, then ranking at the end.
 - Dartboard, on the other hand, firstly finds the most relevant chunk, then proceed to find the next chunk that: has relevance with the query, also differs from the first chunk. In other words, dartboard finds `k` chunks that are: relevant to the query, and also differs from each others. The purpose is not to find the best chunks, but a collective of chunks that when they come together, provides the most comprehensive context to feed to the LLM.
 41. This technique does not require extensive API calls to preprocess data, only linear algebra and statistics are needed to optimize. This is much more reliable than APIs, which can sometimes be overkill and time-consuming.
+
+## 18 - Multimodal Rag With captioning
+42. Up until now, every techniques was just only for plain text, images weren't considered. So, this technique introduces a way to incorporate images information by first use an LLM to caption the image, then use an embedding model to generate its embedding, finally store both the text and images embedding into a single vectorstore.
+43. The LLM response with no `StrOutputParser` would be redundant for the process of creating vectorstore. It is recommended to use `StrOutputParser` if you only care for the final main content, not the metadata.

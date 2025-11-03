@@ -4,3 +4,4 @@ RAG_TECHNIQUES/
 .deepeval
 __pycache__/
 .ipynb_checkpoints/
+extracted_images/
