@@ -129,3 +129,9 @@ Also, there exists many more reranking techniques but I won't be discussing abou
 ## 18 - Multimodal Rag With captioning
 42. Up until now, every techniques was just only for plain text, images weren't considered. So, this technique introduces a way to incorporate images information by first use an LLM to caption the image, then use an embedding model to generate its embedding, finally store both the text and images embedding into a single vectorstore.
 43. The LLM response with no `StrOutputParser` would be redundant for the process of creating vectorstore. It is recommended to use `StrOutputParser` if you only care for the final main content, not the metadata.
+
+## 19 - Retrieval with feedback loop
+44. The most complex part of this technique lies in how you adjust file relevancy, how you store feedback, and how you fine-tune the vector index of good feedbacks.
+45. This technique requires a good amount of initial feedbacks to actually be able to see improvement.
+46. A huge drawback is that the cost and latency would skyrocket if the `relevant_feedback` and `docs` increase in number. Given 10 docs and 10 feedbacks each, that would be 100 LLM calls just for adjusting the relevance score. This is not viable in production.
+47. This jupiter file only shows how to implement the technique, it does not include the part where user can actually grade the answer and provide a feedback.
